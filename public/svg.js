@@ -1,7 +1,7 @@
-
+ 
  let random_data = [], pixels = []
- width = window.innerWidth
- height = window.innerHeight
+ width = 512
+ height = 512
 
  function generate_Random_points(){
      random_data = [];
@@ -14,45 +14,33 @@
      }
  }
 
-/*var Rainbow = require("rainbowvis.js");
-let gradient = new Rainbow()
-gradient.setNumberRange(Math.min(pixels), Math.max(pixels))
-gradient.setSpectrum("pink", 'white')
-function generate_pixels(){
-     pixels = []
-     let hex_string = ''
-     for(let y = 0; y <= window.innerHeight; y+=5){
-          for(let x = 0; x <= window.innerWidth; x+=5){
-               func_val = (x**2) + ((y+1)**2) -(5*Math.cos(1.5*x+1.5)) -(3*Math.cos(2*x - 1.5))
-               hex_string =  graident.colorAt(func_val)
-               pixels.push({
-                    //the weight will be the id based on the defined function 
-                    id: "#" + hex_string,
-                    x: x,
-                    y: y,
-               });
-          }
-     }
- }*/
 async function display(){
+     //wait to generate heatmap with assigned weights for particles to calculate off of
      await fetch('/gradient')
           .then(response => {
                response.json().then(res_arr=>({
                     ret_arr: res_arr
                })     
           ).then(res=>{
+
+               //assign pixel data from server generated cords
                pixels = res.ret_arr
+
                //initalize d3 svg
                var svg = d3.select("svg").attr("width", width).attr("height", height);
                svg.style("display", "block")
                svg.style("margin", "auto")
 
-               var simulation = d3.forceSimulation()
-               .force("center", d3.forceCenter(width/2, height/2))
-               .force("charge", d3.forceManyBody())
-               .force("x", d3.forceX(width/2).strength(0.3))
-               .force("y", d3.forceY(height/2).strength(0.3))
 
+               //inmitialize simulation
+               var simulation = d3.forceSimulation()
+               //.force("center", d3.forceCenter(width/2, height/2))
+               //.force("charge", d3.forceManyBody())
+               //.force("x", d3.forceX(width/2).strength(0.3))
+               //.force("y", d3.forceY(height/2).strength(0.3))
+
+
+               //define pixel props
                var pixel = svg.append('g')
                     .attr('class', 'pixels')
                     .selectAll('rect')
@@ -60,10 +48,11 @@ async function display(){
                     .enter().append('rect')
                          .attr('x', function(d){ return d.x })
                          .attr('y', function(d){ return d.y })
-                         .attr('width', 3)
-                         .attr('height', 3)
+                         .attr('width', window.innerWidth/30)
+                         .attr('height', window.innerHeight/30)
                          .attr('fill', function(d){ return d.id })
 
+               //define node props
                var node = svg
                     .append('g')
                     .attr('class', 'nodes')
@@ -71,23 +60,23 @@ async function display(){
                     .data(random_data)
                     .enter().append('circle')
                          .attr('r', 7)
-                         .attr("fill", "red")
+                         .attr("fill", "black")
                          .call(d3.drag()
                               .on("start", dragstarted)
                               .on("drag", dragged)
                               .on("end", dragended));
                          
+               //kinda optional, but add the data cords to simulation node cords
                simulation.nodes(random_data)
+
+               //trigger simulation event loop
                simulation.on('tick', handletick);
-
-
-               //event handlers
                function handletick(){
                     node.attr('cx', function(d) { return d.x; })
                     node.attr('cy', function(d) { return d.y; })
                }
 
-
+               //event handlers
                function dragstarted(e){
                     if(!d3.event.active)
                          simulation.alphaTarget(0.2).restart();
@@ -122,18 +111,7 @@ async function display(){
                svg.attr('transform', `translate(${newx},${newy}) scale(${d3.event.transform.k})`)
                }
                */
-
-
-
-
-               /*
-               display gradient
-               - generate square 1 unit length and assign it a color val DONE
-               - gradient color scale will be based between min/max values produced from function
-               - min coordinate will be assigned as glabal value
-               */
-
-               console.log(pixels)
+               //console.log(pixels)
                return
           })
      })          
