@@ -1,7 +1,10 @@
+ //import {running} from './perlin.js'
  
- let random_data = [], pixels = []
+ let random_data = [], unit_pixels = []
  width = 512
  height = 512
+ //import './perlin.mjs'
+
 
  function generate_Random_points(){
      random_data = [];
@@ -22,9 +25,12 @@ async function display(){
                     ret_arr: res_arr
                })     
           ).then(res=>{
+               document.querySelector("#load").innerHTML = ''
+
+               running = res.ret_arr.running;
 
                //assign pixel data from server generated cords
-               pixels = res.ret_arr
+               unit_pixels = res.ret_arr.pixels
 
                //initalize d3 svg
                var svg = d3.select("svg").attr("width", width).attr("height", height);
@@ -42,9 +48,9 @@ async function display(){
 
                //define pixel props
                var pixel = svg.append('g')
-                    .attr('class', 'pixels')
+                    .attr('class', 'unit_pixels')
                     .selectAll('rect')
-                    .data(pixels)
+                    .data(unit_pixels)
                     .enter().append('rect')
                          .attr('x', function(d){ return d.x })
                          .attr('y', function(d){ return d.y })
@@ -76,6 +82,19 @@ async function display(){
                     node.attr('cy', function(d) { return d.y; })
                }
 
+               const start_button = document.createElement("button")
+               start_button.innerHTML = "start";
+               start_button.onclick = function (){
+                    if (running === false){
+                         start_button.innerHTML = "stop";
+                         running = true;
+                    }else{
+                         start_button.innerHTML = "start";
+                         running = false;
+                    }
+               };
+               document.body.appendChild(start_button);
+
                //event handlers
                function dragstarted(e){
                     if(!d3.event.active)
@@ -96,6 +115,8 @@ async function display(){
                     e.fy = null
                }
 
+
+
                /*
                //enable zoom functionality
                svg.call(d3.zoom()
@@ -111,7 +132,7 @@ async function display(){
                svg.attr('transform', `translate(${newx},${newy}) scale(${d3.event.transform.k})`)
                }
                */
-               //console.log(pixels)
+               //console.log(unit_pixels)
                return
           })
      })          

@@ -2,16 +2,36 @@
 <html>
     <head>
         <meta charset = "utf-8">
-        <style src = "style.css"></style>
+        <style>
+            .header{
+                justify-content: center;
+                align-items: center;
+                flex: auto;
+                display: flex;
+                padding: 10px;
+            }
+
+            button{
+                padding: 10px;
+                margin-top: 15px;
+                margin-left: auto;
+                margin-right: auto;
+                flex: auto;
+                display: flex;
+            }
+        </style>
         <title>Bryce PSO</title>
     </head>
     <body>
         <div>
+            <h2 class = "header">Welcome to my PSO simulator :3 <3</h2>
             <!--<svg viewBox="0 0 300 300">-->
+            <h1 class = "header" id = "load">Loading particle babies and gradient...</h1>
             <svg></svg>
         </div>
         
         <script src = "https://d3js.org/d3.v4.min.js"></script>
+        <script src = "public/perlin.js"  type = "module"></script>
         <script type = "text/javascript" src = "public/svg.js"></script>
     </body>
 </html>

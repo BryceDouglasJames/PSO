@@ -20,10 +20,18 @@ let perms = [
 49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
 138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180]
 
+//GLOBAL VALUES
+export let pixels = [];
+export let grid_size = 4;
+export let resolution = 30;
+export let color_scale = 200;
+export let running = false;
+//*******************
 
-gradients = {}
-cache = {}
-simple_vects = []
+
+let gradients = {}
+let cache = {}
+let simple_vects = []
 
 //for simple randoms. assign vector to each unit vertex
 for (let i = 0; i < 8; i++){
@@ -43,7 +51,7 @@ function simple_random(){
 
 //get dot product of gradient vectors and distance vectors
 function dot_product(x,y,vx,vy){
-    direction = {x:x - vx, y: y - vy}, gradient = {x:0, y:0};
+    let direction = {x:x - vx, y: y - vy}, gradient = {x:0, y:0};
     if(gradients[[vx,vy]]){
         //found gradient in table
         gradient = gradients[[vx,vy]];
@@ -57,7 +65,7 @@ function dot_product(x,y,vx,vy){
 }
 
 //generate some voodoo perlin values for each unit vertex
-function get_perl_val(x,y){
+export function get_perl_val(x,y){
     
     x = x.toFixed(5)
     y = y.toFixed(5)
@@ -96,4 +104,20 @@ function intercept(x, a, b){
     return a + fade_func(x) * (b-a);  
 }   
 
-module.exports = {get_perl_val}
+/*export default {
+    get_perl_val,
+    pixels,
+    grid_size,
+    resolution,
+    color_scale,
+    running
+}*/
+
+/*module.exports = {
+    get_perl_val,
+    pixels,
+    grid_size,
+    resolution,
+    color_scale,
+    running
+}*/
