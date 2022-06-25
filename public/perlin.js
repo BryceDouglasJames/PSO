@@ -23,9 +23,10 @@ let perms = [
 //GLOBAL VALUES
 export let pixels = [];
 export let grid_size = 4;
-export let resolution = 30;
+export let resolution = 20;
 export let color_scale = 200;
 export let running = false;
+export let max_iters = 100;
 //*******************
 
 
