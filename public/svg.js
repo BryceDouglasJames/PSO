@@ -6,7 +6,7 @@
      static global_best = null;
      static global_best_val = -1;
      static grid = [];
-     constructor(particles, velocities, fitness, grid, trials, amount, width, height){
+     constructor(original, particles, velocities, fitness, grid, trials, amount, width, height){
           //defaults
           this.w = 0.8;
           this.c1 = 1;
@@ -18,6 +18,7 @@
           this.grid = grid;
           this.width = width;
           this.height = height;
+          this.original = original;
      
           //set particle attributes
           this.particles = particles;
@@ -38,6 +39,14 @@
      
      }
  
+     reset(){
+          console.log(this.original)
+          this.particles.map((particle) =>{
+               particle.x = this.original[particle.id]/2400;
+               particle.y = this.original[particle.id]/2400;
+          })
+     }
+
      next(){
          if(this.current_iter > 0){
              this.move();
@@ -70,63 +79,69 @@
 
           let new_vs = [];
           //let new_pos = [];
-
-          this.particles.map((particle) =>{
-               //generate cognitive params
-               let temp = particle;
-               let px = temp.x;
-               let py = temp.y;
-
-               let v = this.w * this.velocities[particle.index];
-          
-               //console.log(v)
+          try {
+               this.particles.map((particle) =>{     
                
+                    //generate cognitive params
+                    let temp = particle;
+                    let px = temp.x;
+                    let py = temp.y;
 
-               //generate cognition local params
-               v += this.c1 * r1[particle.id] * (this.particles_best[particle.index].pbest - v);
+                    let v = this.w * this.velocities[particle.index];
                
-               //console.log(`c1: ${this.c1} r1: ${r1[particle.id]} val: ${this.particles_best[particle.index].pbest}`)
-               
+                    //console.log(v)
+                    
 
-               //grab nearest pixel node by using x,y cord window                   
-               let temp_pos  = this.grid.filter(function(obj) { return (Math.floor(obj.x) - 10 <= px && Math.floor(obj.x) + 10 >= px)});
-               currentpos = temp_pos;
-               temp_pos  = currentpos.find(function(obj)  {return (Math.floor(obj.y) - 10 <= py && Math.floor(obj.y) + 10 >= py)});
-               currentpos = temp_pos;
-     
-               //if undefined, widen the window
-               if(currentpos === undefined){
-                    temp_pos  = this.grid.filter(function(obj) { return (Math.floor(obj.x) - 80 <= px && Math.floor(obj.x) + 80 >= px)});
+                    //generate cognition local params
+                    v += this.c1 * r1[particle.id] * (this.particles_best[particle.index].pbest - v);
+                    
+                    //console.log(`c1: ${this.c1} r1: ${r1[particle.id]} val: ${this.particles_best[particle.index].pbest}`)
+                    
+
+                    //grab nearest pixel node by using x,y cord window                   
+                    let temp_pos  = this.grid.filter(function(obj) { return (Math.floor(obj.x) - 10 <= px && Math.floor(obj.x) + 10 >= px)});
                     currentpos = temp_pos;
-                    temp_pos  = currentpos.find(function(obj)  {return (Math.floor(obj.y) - 80 <= py && Math.floor(obj.y) + 80 >= py)});
-                    currentpos = temp_pos
-               }
+                    temp_pos  = currentpos.find(function(obj)  {return (Math.floor(obj.y) - 10 <= py && Math.floor(obj.y) + 10 >= py)});
+                    currentpos = temp_pos;
+          
+                    //if undefined, widen the window
+                    if(currentpos === undefined){
+                         temp_pos  = this.grid.filter(function(obj) { return (Math.floor(obj.x) - 50 <= px && Math.floor(obj.x) + 50 >= px)});
+                         currentpos = temp_pos;
+                         temp_pos  = currentpos.find(function(obj)  {return (Math.floor(obj.y) - 10 <= py && Math.floor(obj.y) + 10 >= py)});
+                         currentpos = temp_pos
+                    }
 
-               //console.log(currentpixel)
-               //You can set this to find either the min or maxima maybe???
-               //right now this will find the highest value
-               //if(this.global_best_val < currentpixel.val){
-               //     this.global_best = particle;
-               //     this.global_best_val = currentpixel.val
-               //}
+                    //console.log(currentpixel)
+                    //You can set this to find either the min or maxima maybe???
+                    //right now this will find the highest value
+                    //if(this.global_best_val < currentpixel.val){
+                    //     this.global_best = particle;
+                    //     this.global_best_val = currentpixel.val
+                    //}
 
-               v += this.c2 * r2[particle.id] * (this.global_best_val - currentpos.val);
+                    v += this.c2 * r2[particle.id] * (this.global_best_val - currentpos.val);
 
-               //update new velocity and move accordingly
-               new_vs[particle.id] = v;
+                    //update new velocity and move accordingly
+                    new_vs[particle.id] = v;
 
-               //update (x,y) of the particle and update particle list
-               //TODO: implement more reliable reposition
-               particle.x += (this.w * v) / this.n;
-               particle.y += (this.w * v) / this.n;
-               this.particles[particle.index] = particle;
+                    //update (x,y) of the particle and update particle list
+                    //TODO: implement more reliable reposition
+                    particle.x += (this.w * v) / this.n;
+                    particle.y += (this.w * v) / this.n;
+                    this.particles[particle.index] = particle;
+                    //console.log(new_vs)
+               
+
+               //console.log(`particles : ${JSON.stringify(this.particles_best)}`)
+               //console.log(this.particles)
                //console.log(new_vs)
-          });
-
-          //console.log(`particles : ${JSON.stringify(this.particles_best)}`)
-          //console.log(this.particles)
-          //console.log(new_vs)
-          //console.log(this.n)
+               //console.log(this.n)
+               });
+          }catch (error) {
+               //console.log(error);
+               this.particles = this.original
+          }
      }
  
      update_best_fit(){
@@ -170,13 +185,13 @@
  }
 
  
- let random_data = [], unit_pixels = []
- width = 300
- height = 300
+ let random_data = [], unit_pixels = [], start_data = [];
+ width = 600;
+ height = 600;
 
  function generate_Random_points(){
      random_data = [];
-     for (let i=0 ; i < 30; i++){
+     for (let i=0 ; i < 50; i++){
           random_data.push({
                id: i,
                pbest: -1,
@@ -197,6 +212,8 @@ async function display(){
                document.querySelector("#load").innerHTML = ''
 
                running = res.ret_arr.running;
+
+               //start_data = [...random_data];
 
                //assign pixel data from server generated cords
                unit_pixels = res.ret_arr.pixels
@@ -219,7 +236,7 @@ async function display(){
                }
 
                 //constructor(particles, velocities, fitness, trials, amount)
-               s = new swarm(random_data, vels, fitess_function, unit_pixels, 50, 100, width, height)
+               s = new swarm(random_data, random_data, vels, fitess_function, unit_pixels, 50, 100, width, height)
 
                //initalize d3 svg
                var svg = d3.select("svg").attr("width", width).attr("height", height);
@@ -243,8 +260,8 @@ async function display(){
                     .enter().append('rect')
                          .attr('x', function(d){ return d.x })
                          .attr('y', function(d){ return d.y })
-                         .attr('width', window.innerWidth/30)
-                         .attr('height', window.innerHeight/30)
+                         .attr('width', window.innerWidth/20)
+                         .attr('height', window.innerHeight/20)
                          .attr('fill', function(d){ return d.id })
 
                //define node props
@@ -261,21 +278,26 @@ async function display(){
                               .on("drag", dragged)
                               .on("end", dragended));
 
-               const start_button = document.createElement("button")
-               start_button.innerHTML = "start";
+                    node.append('title').text(function(d){return JSON.stringify(d)})
+
+               const start_button = document.getElementById('start')
+               start_button.innerHTML = "Start Sim";
                start_button.onclick = function (){
                     
                     if (running === false){
-                         console.log("START")
-                         start_button.innerHTML = "stop";
+                         start_button.innerHTML = "Stop Sim";
                          running = true;
                     }else{
-                         console.log("STOP")
-                         start_button.innerHTML = "start";
+                         start_button.innerHTML = "Start Sim";
                          running = false;
                     }               
                };
-               document.body.appendChild(start_button);               
+               
+               const reset_button = document.getElementById('reset')
+               reset_button.innerHTML = "Generate New Sim";
+               reset_button.onclick = function (){
+                    window.location.reload()                       
+               };
                          
                //kinda optional, but add the data cords to simulation node cords
                simulation.nodes(random_data)
@@ -285,12 +307,8 @@ async function display(){
 
                let refresh = 0; let iters = 0;
                function handletick(){
-                    if (refresh > 1000){
-                         refresh = 0;
-                         //simulation.alphaTarget(0.4).restart();
-                    }else if(running){
+                    if(running){
                          simulation.alphaTarget(0.2)
-                         refresh = 0
                          console.log("HEY")
                          s.next()
                          iters += 1;
@@ -300,14 +318,13 @@ async function display(){
                               iters = 0;
                               start_button.click();
                          }
-                         refresh += 1
-                    }else{
-                         refresh += 1
                     }
-                    
+          
 
                     node.attr('cx', function(d) { return d.x; })
                     node.attr('cy', function(d) { return d.y; })
+                    node.select('title').text(function(d){return `Personal Best Val: ${d.pbest.toFixed(2)}\nx: ${d.x.toFixed(2)}\ny: ${d.y.toFixed(2)}`})
+                    //node.text(function(d) { return JSON.stringify(d)})
                     //node.attr('vy', function(d) { return d.vy })
                     //node.attr('vx', function(d) { return d.vx })
                }

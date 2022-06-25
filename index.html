@@ -11,13 +11,17 @@
                 padding: 10px;
             }
 
-            button{
-                padding: 10px;
-                margin-top: 15px;
-                margin-left: auto;
-                margin-right: auto;
-                flex: auto;
+            .button-contain{
+                flex-wrap: nowrap;
                 display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .button-contain > button{
+                padding: 10px;
+                margin: 20px;
+                text-align: center;
             }
         </style>
         <title>Bryce PSO</title>
@@ -28,6 +32,13 @@
             <!--<svg viewBox="0 0 300 300">-->
             <h1 class = "header" id = "load">Loading particle babies and gradient...</h1>
             <svg></svg>
+            
+            <div class = "button-contain">
+                <button id = 'start'></button>
+                <button id = 'reset'></button>
+            </div>
+            
+            
         </div>
         
         <!--<script src = "https://d3js.org/d3.v4.min.js"></script>-->

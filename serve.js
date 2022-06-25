@@ -1,11 +1,11 @@
 'use strict';
 import {get_perl_val,
-    pixels,
     grid_size,
     resolution,
     color_scale,
     running,
-    max_iters
+    max_iters,
+    new_map
  } from './public/perlin.js';
 import express, {json} from 'express';
 import path from 'path'
@@ -36,23 +36,24 @@ app.post('change_resolution', (req, res)=>{
 })
 
 app.get('/gradient', (_, res) =>{
-        let index = 0;
-        for(let y = 0; y < grid_size; y+=(grid_size/resolution)/grid_size){
-            for(let x = 0; x < grid_size; x+=(grid_size/resolution)/grid_size){
-                let func_val = get_perl_val(x,y) * color_scale
-                pixels.push({
-                        //the weight will be based on the defined value provided by the  noise generator 
-                        id: `hsl(${parseInt(func_val)}, 60%, 50%)`,
-                        x: x/grid_size*300,
-                        y: y/grid_size*300,
-                        val: func_val,
-                        index: index++
-                });
-                
-            }
+    new_map();
+    let pix = [];
+    let index = 0;
+    for(let y = 0; y < grid_size; y+=(grid_size/resolution)/grid_size){
+        for(let x = 0; x < grid_size; x+=(grid_size/resolution)/grid_size){
+            let func_val = get_perl_val(x,y) * color_scale
+            pix.push({
+                    //the weight will be based on the defined value provided by the  noise generator 
+                    id: `hsl(${parseInt(func_val)}, 60%, 50%)`,
+                    x: x/grid_size*600,
+                    y: y/grid_size*600,
+                    val: func_val,
+                    index: index++
+            });            
         }
+    }
     let answer = {
-        "pixels": pixels,
+        "pixels": pix,
         "grid_size": grid_size,
         "resolution": resolution,
         "color_scale": color_scale,

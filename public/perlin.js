@@ -35,16 +35,23 @@ let cache = {}
 let simple_vects = []
 
 //for simple randoms. assign vector to each unit vertex
-for (let i = 0; i < 8; i++){
-    let temp = []
-    for(let j = 0; j < 8; j++){
-        temp.push(simple_random())
+export function new_map(){
+    simple_vects = []
+    gradients = {}
+    cache = {}
+    
+    for (let i = 0; i < 8; i++){
+        let temp = []
+        for(let j = 0; j < 8; j++){
+            temp.push(simple_random())
+        }
+        simple_vects.push(temp)
     }
-    simple_vects.push(temp)
 }
 
+
 //This will generate a random unit vector.. not so random
-function simple_random(){
+export function simple_random(){
     let t = Math.random() * 2 * Math.PI
     let cord = {x: Math.cos(t), y: Math.sin(t)}
     return cord;
